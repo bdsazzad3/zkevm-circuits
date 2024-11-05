@@ -1,8 +1,6 @@
 use std::{collections::BTreeMap, env, iter::repeat};
 
-use aggregator::{
-    eip4844::decode_blob, BatchData, BatchHash, BatchHeader, ChunkInfo, MAX_AGG_SNARKS,
-};
+use aggregator::{decode_bytes, BatchData, BatchHash, BatchHeader, ChunkInfo, MAX_AGG_SNARKS};
 use anyhow::{bail, Result};
 use eth_types::H256;
 use halo2_proofs::{halo2curves::bn256::Bn256, poly::kzg::commitment::ParamsKZG};
@@ -198,17 +196,17 @@ impl<'params> Prover<'params> {
         assert_eq!(
             batch_header.blob_data_proof[0], batch.batch_header.blob_data_proof[0],
             "BatchHeader(sanity) mismatch blob data proof (z) expected={}, got={}",
-            batch.batch_header.blob_data_proof[0], batch_header.blob_data_proof[0],
+            batch_header.blob_data_proof[0], batch.batch_header.blob_data_proof[0],
         );
         assert_eq!(
             batch_header.blob_data_proof[1], batch.batch_header.blob_data_proof[1],
             "BatchHeader(sanity) mismatch blob data proof (y) expected={}, got={}",
-            batch.batch_header.blob_data_proof[1], batch_header.blob_data_proof[1],
+            batch_header.blob_data_proof[1], batch.batch_header.blob_data_proof[1],
         );
         assert_eq!(
             batch_header.blob_versioned_hash, batch.batch_header.blob_versioned_hash,
             "BatchHeader(sanity) mismatch blob versioned hash expected={}, got={}",
-            batch.batch_header.blob_versioned_hash, batch_header.blob_versioned_hash,
+            batch_header.blob_versioned_hash, batch.batch_header.blob_versioned_hash,
         );
 
         let batch_hash = batch_header.batch_hash();
@@ -219,7 +217,7 @@ impl<'params> Prover<'params> {
         // sanity check:
         // - conditionally decoded blob should match batch data.
         let batch_bytes = batch_data.get_batch_data_bytes();
-        let decoded_blob_bytes = decode_blob(&batch.blob_bytes)?;
+        let decoded_blob_bytes = decode_bytes(&batch.blob_bytes)?;
         assert_eq!(
             batch_bytes, decoded_blob_bytes,
             "BatchProvingTask(sanity) mismatch batch bytes and decoded blob bytes",
